@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetCareBook — Patient Immunization History</title>
+    <link rel="stylesheet" href="css/styles.css?v=3">
+    <style>
+        @media print {
+            .app-header, .btn, .toolbar-bar, .app-footer, select { display: none !important; }
+            .content-wrapper { padding: 0 !important; }
+            .panel { border: 1px solid #ccc !important; box-shadow: none !important; }
+            body { background: #fff !important; }
+        }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-container">
+            <a href="index.html" class="brand-section">
+                <div class="brand-badge">
+                    <svg class="brand-logo-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <ellipse cx="12" cy="16.5" rx="4.6" ry="3.6"/>
+                        <ellipse cx="6.5" cy="9" rx="1.75" ry="2.3" transform="rotate(-15 6.5 9)"/>
+                        <ellipse cx="17.5" cy="9" rx="1.75" ry="2.3" transform="rotate(15 17.5 9)"/>
+                        <ellipse cx="10" cy="5.5" rx="1.6" ry="2.15"/>
+                        <ellipse cx="14" cy="5.5" rx="1.6" ry="2.15"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="brand-name">PetCareBook</span>
+                    <span class="brand-sub">Clinical CIS</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul class="nav-menu" id="mainNavMenu">
+                    <li><a href="index.html" class="nav-item-link" id="nav-dashboard">Dashboard</a></li>
+                    <li><a href="pets.html" class="nav-item-link" id="nav-pets">Patients</a></li>
+                    <li><a href="owners.html" class="nav-item-link" id="nav-owners">Clients</a></li>
+                    <li><a href="vaccinate.html" class="nav-item-link" id="nav-vaccinate">Administer</a></li>
+                    <li>
+                        <a href="due-soon.html" class="nav-item-link" id="nav-due-soon">
+                            Schedule
+                            <span id="nav-due-badge" class="count-pill" style="display: none;">0</span>
+                        </a>
+                    </li>
+                    <li><a href="history.html" class="nav-item-link active" id="nav-history">Records</a></li>
+                    <li><a href="vaccines.html" class="nav-item-link" id="nav-vaccines">Protocols</a></li>
+                </ul>
+            </nav>
+
+            <div class="nav-actions">
+                <a href="vaccinate.html" class="btn btn-primary btn-sm">+ Record Vaccine</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="content-wrapper">
+        <div class="view-header">
+            <div class="view-title-group">
+                <h1>Patient Immunization Ledger</h1>
+                <p>Complete official vaccination history, lot tracking, and certified booster timeline.</p>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <button onclick="window.print()" class="btn btn-secondary">Print / Export Record</button>
+                <a id="logBoosterBtn" href="vaccinate.html" class="btn btn-primary">+ Record Vaccination</a>
+            </div>
+        </div>
+
+        <!-- Patient Lookup Bar -->
+        <div class="panel" style="padding: 1rem 1.25rem;">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1; min-width: 280px;">
+                    <label class="form-label" style="margin: 0; white-space: nowrap;">Patient Record:</label>
+                    <select id="petSelect" class="form-select" onchange="onPetChange()">
+                        <option value="">-- Choose a Patient --</option>
+                    </select>
+                </div>
+                <div id="quickOwnerInfo" style="font-size: 0.85rem; color: var(--text-muted);">
+                    <!-- Auto-populated -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Clinical Patient Profile Summary Banner -->
+        <div id="petProfileCard" class="panel" style="display: none; padding: 1.25rem 1.5rem; background: var(--slate-50);">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.5rem;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 0.6rem;">
+                        <h2 id="petProfileName" style="font-size: 1.35rem; font-weight: 700; color: var(--slate-900);">Milo</h2>
+                        <span id="petProfileSpeciesBadge" class="tag-species">Dog</span>
+                    </div>
+                    <div id="petProfileSub" style="font-size: 0.85rem; color: var(--slate-600); margin-top: 0.2rem;">
+                        Golden Retriever &bull; Born Sep 12, 2024 &bull; 2 yrs old
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 2rem; border-left: 1px solid var(--border-strong); padding-left: 1.5rem;">
+                    <div>
+                        <span style="font-size: 0.725rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; display: block;">Client / Owner</span>
+                        <div id="petProfileOwner" style="font-weight: 600; color: var(--slate-800);">Sarah Connor</div>
+                        <div id="petProfileContact" style="font-size: 0.775rem; color: var(--text-muted);">sarah@example.com</div>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.725rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; display: block;">Total Inoculations</span>
+                        <div id="petProfileTotalVaccines" style="font-size: 1.25rem; font-weight: 700; color: var(--primary-700);">2</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Complete Records Ledger Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title">Immunization History Ledger</span>
+                <span id="recordCountPill" class="tag-species">0 Entries</span>
+            </div>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date Administered</th>
+                            <th>Vaccine / Target Protocol</th>
+                            <th>Interval</th>
+                            <th>Next Scheduled Due</th>
+                            <th>Clinical Status</th>
+                            <th>Lot / Batch #</th>
+                            <th>Facility / Veterinarian</th>
+                            <th>Observations</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 2rem;">Select a patient above to load medical history.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="emptyHistoryState" class="panel" style="display: none; text-align: center; padding: 3rem 1.5rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--slate-800);">No Immunization Entries Recorded</h3>
+            <p style="color: var(--text-muted); font-size: 0.875rem; margin: 0.5rem 0 1.25rem 0;">This patient currently has no vaccination records logged in the system.</p>
+            <a id="emptyStateVaccinateBtn" href="vaccinate.html" class="btn btn-primary btn-sm">+ Record First Vaccine</a>
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script src="js/common.js?v=3"></script>
+    <script>
+        let allPets = [];
+        let currentPetId = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            renderNavbar('history');
+            renderFooter();
+            await loadPets();
+            checkUrlParams();
+        });
+
+        async function loadPets() {
+            try {
+                allPets = await apiFetch('/api/pets');
+                const select = document.getElementById('petSelect');
+                if (!allPets || allPets.length === 0) {
+                    select.innerHTML = '<option value="">No registered patients found.</option>';
+                } else {
+                    select.innerHTML = '<option value="">-- Choose a Patient --</option>' +
+                        allPets.map(p => `
+                            <option value="${p.id}">
+                                ${escapeHtml(p.name)} [${escapeHtml(p.species)} &bull; Client: ${escapeHtml(p.ownerName)}]
+                            </option>
+                        `).join('');
+                }
+            } catch (err) {
+                showToast('Failed to load patients: ' + err.message, 'error');
+            }
+        }
+
+        function checkUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const petId = urlParams.get('petId');
+            if (petId) {
+                document.getElementById('petSelect').value = petId;
+                onPetChange();
+            } else if (allPets.length > 0) {
+                document.getElementById('petSelect').value = allPets[0].id;
+                onPetChange();
+            }
+        }
+
+        async function onPetChange() {
+            const petIdVal = document.getElementById('petSelect').value;
+            if (!petIdVal) {
+                document.getElementById('petProfileCard').style.display = 'none';
+                document.getElementById('historyTableBody').innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 2rem;">Select a patient above to load history.</td></tr>';
+                document.getElementById('emptyHistoryState').style.display = 'none';
+                return;
+            }
+
+            currentPetId = parseInt(petIdVal, 10);
+            const pet = allPets.find(p => p.id === currentPetId);
+            if (!pet) return;
+
+            history.replaceState(null, '', `history.html?petId=${currentPetId}`);
+            document.getElementById('logBoosterBtn').href = `vaccinate.html?petId=${currentPetId}`;
+            document.getElementById('emptyStateVaccinateBtn').href = `vaccinate.html?petId=${currentPetId}`;
+
+            // Populate Patient Profile
+            document.getElementById('petProfileCard').style.display = 'block';
+            document.getElementById('petProfileName').textContent = pet.name;
+            document.getElementById('petProfileSpeciesBadge').textContent = pet.species;
+            
+            let ageStr = '';
+            if (pet.ageYears > 0) ageStr += `${pet.ageYears} yr${pet.ageYears > 1 ? 's' : ''} `;
+            if (pet.ageMonths > 0) ageStr += `${pet.ageMonths} mo`;
+            if (!ageStr) ageStr = 'Juvenile';
+
+            document.getElementById('petProfileSub').textContent = `${pet.breed} • Born ${formatDate(pet.dateOfBirth)} (${ageStr} old)${pet.weight ? ' • ' + pet.weight + ' kg' : ''}`;
+            document.getElementById('petProfileOwner').textContent = pet.ownerName;
+            document.getElementById('petProfileContact').textContent = `${pet.ownerPhone} • ${pet.ownerEmail}`;
+
+            // Fetch History Ledger
+            try {
+                const records = await apiFetch(`/api/pets/${currentPetId}/vaccinations`);
+                document.getElementById('petProfileTotalVaccines').textContent = records ? records.length : 0;
+                document.getElementById('recordCountPill').textContent = `${records ? records.length : 0} Entries`;
+
+                const tableBody = document.getElementById('historyTableBody');
+                const emptyState = document.getElementById('emptyHistoryState');
+
+                if (!records || records.length === 0) {
+                    tableBody.innerHTML = '';
+                    emptyState.style.display = 'block';
+                    return;
+                }
+
+                emptyState.style.display = 'none';
+                tableBody.innerHTML = records.map(r => `
+                    <tr>
+                        <td class="col-nowrap"><strong>${formatDate(r.dateAdministered)}</strong></td>
+                        <td><strong>${escapeHtml(r.vaccineName)}</strong></td>
+                        <td class="col-nowrap">${r.standardIntervalDays} days</td>
+                        <td class="col-nowrap"><strong>${formatDate(r.nextDueDate)}</strong></td>
+                        <td class="col-nowrap">${getDueStatusBadge(r.status, r.daysRemainingUntilDue)}</td>
+                        <td class="col-nowrap"><code>${escapeHtml(r.batchNumber || '—')}</code></td>
+                        <td>${escapeHtml(r.administeredBy || '—')}</td>
+                        <td style="max-width: 220px; font-size: 0.8rem; color: var(--text-muted);">${escapeHtml(r.notes || '—')}</td>
+                        <td class="col-nowrap" style="text-align: right;">
+                            <button onclick="handleDeleteRecord(${r.id})" class="btn btn-danger btn-sm" title="Remove Entry">${ICONS.trash}</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (err) {
+                showToast('Failed to load history ledger: ' + err.message, 'error');
+            }
+        }
+
+        async function handleDeleteRecord(recordId) {
+            if (!confirm('Are you sure you want to remove this vaccination ledger entry?')) return;
+            try {
+                await apiFetch(`/api/vaccinations/${recordId}`, { method: 'DELETE' });
+                showToast('Vaccination record removed.', 'warning');
+                onPetChange();
+            } catch (err) {
+                showToast('Delete operation failed: ' + err.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

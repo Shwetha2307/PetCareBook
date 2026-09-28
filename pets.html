@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetCareBook — Patient Registry</title>
+    <link rel="stylesheet" href="css/styles.css?v=3">
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-container">
+            <a href="index.html" class="brand-section">
+                <div class="brand-badge">
+                    <svg class="brand-logo-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <ellipse cx="12" cy="16.5" rx="4.6" ry="3.6"/>
+                        <ellipse cx="6.5" cy="9" rx="1.75" ry="2.3" transform="rotate(-15 6.5 9)"/>
+                        <ellipse cx="17.5" cy="9" rx="1.75" ry="2.3" transform="rotate(15 17.5 9)"/>
+                        <ellipse cx="10" cy="5.5" rx="1.6" ry="2.15"/>
+                        <ellipse cx="14" cy="5.5" rx="1.6" ry="2.15"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="brand-name">PetCareBook</span>
+                    <span class="brand-sub">Clinical CIS</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul class="nav-menu" id="mainNavMenu">
+                    <li><a href="index.html" class="nav-item-link" id="nav-dashboard">Dashboard</a></li>
+                    <li><a href="pets.html" class="nav-item-link active" id="nav-pets">Patients</a></li>
+                    <li><a href="owners.html" class="nav-item-link" id="nav-owners">Clients</a></li>
+                    <li><a href="vaccinate.html" class="nav-item-link" id="nav-vaccinate">Administer</a></li>
+                    <li>
+                        <a href="due-soon.html" class="nav-item-link" id="nav-due-soon">
+                            Schedule
+                            <span id="nav-due-badge" class="count-pill" style="display: none;">0</span>
+                        </a>
+                    </li>
+                    <li><a href="history.html" class="nav-item-link" id="nav-history">Records</a></li>
+                    <li><a href="vaccines.html" class="nav-item-link" id="nav-vaccines">Protocols</a></li>
+                </ul>
+            </nav>
+
+            <div class="nav-actions">
+                <a href="vaccinate.html" class="btn btn-primary btn-sm">+ Record Vaccine</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="content-wrapper">
+        <div class="view-header">
+            <div class="view-title-group">
+                <h1>Patient Registry</h1>
+                <p>Comprehensive animal health directory, biological age profiling, and linked records.</p>
+            </div>
+            <div>
+                <button class="btn btn-primary" onclick="openRegisterPetModal()">+ Register Patient</button>
+            </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="toolbar-bar">
+            <div class="search-field">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="searchInput" placeholder="Filter by patient name, breed, or owner..." oninput="onSearchChange()">
+            </div>
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="filterBySpecies('all', this)">All Species</button>
+                <button class="tab-btn" onclick="filterBySpecies('Dog', this)">Canine (Dogs)</button>
+                <button class="tab-btn" onclick="filterBySpecies('Cat', this)">Feline (Cats)</button>
+                <button class="tab-btn" onclick="filterBySpecies('Bird', this)">Avian (Birds)</button>
+                <button class="tab-btn" onclick="filterBySpecies('Other', this)">Other</button>
+            </div>
+        </div>
+
+        <!-- Patients Grid Container -->
+        <div id="petsGrid" class="entity-grid">
+            <!-- Dynamically populated -->
+        </div>
+
+        <div id="emptyPetsState" class="panel" style="display: none; text-align: center; padding: 3rem 1.5rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--slate-800);">No Patients Found</h3>
+            <p style="color: var(--text-muted); font-size: 0.875rem; margin: 0.5rem 0 1.25rem 0;">No active patient records match the selected filter criteria.</p>
+            <button class="btn btn-primary btn-sm" onclick="openRegisterPetModal()">+ Register New Patient</button>
+        </div>
+    </main>
+
+    <!-- Register Patient Modal Dialog -->
+    <div id="registerPetModal" class="modal-backdrop">
+        <div class="modal-card">
+            <div class="modal-header-bar">
+                <h2>Register New Patient</h2>
+                <button class="modal-close-btn" onclick="closeModal('registerPetModal')">&times;</button>
+            </div>
+            <form id="registerPetForm" onsubmit="handleRegisterPet(event)">
+                <div style="padding: 1.25rem;">
+                    <div class="form-group">
+                        <label class="form-label">Patient Name *</label>
+                        <input type="text" id="petName" class="form-input" placeholder="e.g. Milo, Luna" required>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Species *</label>
+                            <select id="petSpecies" class="form-select" required>
+                                <option value="">-- Select Species --</option>
+                                <option value="Dog">Dog (Canine)</option>
+                                <option value="Cat">Cat (Feline)</option>
+                                <option value="Bird">Bird (Avian)</option>
+                                <option value="Rabbit">Rabbit (Lagomorph)</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Breed *</label>
+                            <input type="text" id="petBreed" class="form-input" placeholder="e.g. Golden Retriever" required>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Date of Birth *</label>
+                            <input type="date" id="petDob" class="form-input" required>
+                            <span class="form-helper">Cannot be in the future.</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Gender</label>
+                            <select id="petGender" class="form-select">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Neutered Male">Neutered Male</option>
+                                <option value="Spayed Female">Spayed Female</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Weight (kg)</label>
+                            <input type="number" id="petWeight" class="form-input" step="0.1" min="0" placeholder="e.g. 14.5">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Assigned Client (Owner) *</label>
+                            <select id="petOwnerId" class="form-select" required>
+                                <option value="">Loading client list...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer-bar">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('registerPetModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="savePetBtn">Save Patient Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="footer-container"></div>
+
+    <script src="js/common.js?v=3"></script>
+    <script>
+        let currentSpecies = 'all';
+        let currentSearch = '';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderNavbar('pets');
+            renderFooter();
+
+            document.getElementById('petDob').max = new Date().toISOString().split('T')[0];
+
+            loadOwnersDropdown();
+            loadPets();
+        });
+
+        async function loadOwnersDropdown() {
+            try {
+                const owners = await apiFetch('/api/owners');
+                const select = document.getElementById('petOwnerId');
+                if (!owners || owners.length === 0) {
+                    select.innerHTML = '<option value="">No clients registered yet. Please add a client first.</option>';
+                } else {
+                    select.innerHTML = '<option value="">-- Select Client --</option>' +
+                        owners.map(o => `<option value="${o.id}">${escapeHtml(o.fullName)} (${escapeHtml(o.email)})</option>`).join('');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function loadPets() {
+            try {
+                let url = '/api/pets';
+                const params = [];
+                if (currentSpecies && currentSpecies !== 'all') params.push(`species=${encodeURIComponent(currentSpecies)}`);
+                if (currentSearch && currentSearch.trim() !== '') params.push(`search=${encodeURIComponent(currentSearch.trim())}`);
+                if (params.length > 0) url += '?' + params.join('&');
+
+                const pets = await apiFetch(url);
+                renderPetsList(pets);
+            } catch (err) {
+                showToast('Failed to load patient records: ' + err.message, 'error');
+            }
+        }
+
+        function renderPetsList(pets) {
+            const grid = document.getElementById('petsGrid');
+            const emptyState = document.getElementById('emptyPetsState');
+
+            if (!pets || pets.length === 0) {
+                grid.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            grid.innerHTML = pets.map(pet => {
+                let ageStr = '';
+                if (pet.ageYears > 0) {
+                    ageStr = `${pet.ageYears} yr${pet.ageYears > 1 ? 's' : ''}`;
+                    if (pet.ageMonths > 0) ageStr += ` ${pet.ageMonths} mo`;
+                } else {
+                    ageStr = `${pet.ageMonths} mo${pet.ageMonths > 1 ? 's' : ''}`;
+                }
+
+                return `
+                    <div class="entity-card">
+                        <div>
+                            <div class="entity-header">
+                                <div>
+                                    <div class="entity-title">${escapeHtml(pet.name)}</div>
+                                    <div class="entity-sub">${escapeHtml(pet.breed)}</div>
+                                </div>
+                                <span class="tag-species">${escapeHtml(pet.species)}</span>
+                            </div>
+
+                            <div class="entity-specs">
+                                <div class="spec-item">
+                                    <span>Age</span>
+                                    <span>${ageStr}</span>
+                                </div>
+                                <div class="spec-item">
+                                    <span>Birth Date</span>
+                                    <span>${formatDate(pet.dateOfBirth)}</span>
+                                </div>
+                                <div class="spec-item">
+                                    <span>Gender</span>
+                                    <span>${escapeHtml(pet.gender || '—')}</span>
+                                </div>
+                                <div class="spec-item">
+                                    <span>Weight</span>
+                                    <span>${pet.weight ? pet.weight + ' kg' : '—'}</span>
+                                </div>
+                            </div>
+
+                            <div style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--slate-700);">
+                                <span style="color: var(--text-muted); font-size: 0.725rem; text-transform: uppercase; display: block; font-weight: 600;">Client Contact</span>
+                                <strong>${escapeHtml(pet.ownerName)}</strong>
+                                <div style="color: var(--text-muted); font-size: 0.775rem;">${escapeHtml(pet.ownerPhone)} &bull; ${escapeHtml(pet.ownerEmail)}</div>
+                            </div>
+                        </div>
+
+                        <div class="entity-footer-actions">
+                            <a href="history.html?petId=${pet.id}" class="btn btn-secondary btn-sm" style="flex: 1;">Ledger (${pet.vaccinationRecordCount})</a>
+                            <a href="vaccinate.html?petId=${pet.id}" class="btn btn-primary btn-sm" style="flex: 1;">Administer</a>
+                            <button onclick="handleDeletePet(${pet.id}, '${escapeHtml(pet.name)}')" class="btn btn-danger btn-sm" title="Delete Patient Record">${ICONS.trash}</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterBySpecies(species, btn) {
+            currentSpecies = species;
+            document.querySelectorAll('.tab-nav .tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            loadPets();
+        }
+
+        let searchDebounce;
+        function onSearchChange() {
+            clearTimeout(searchDebounce);
+            searchDebounce = setTimeout(() => {
+                currentSearch = document.getElementById('searchInput').value;
+                loadPets();
+            }, 250);
+        }
+
+        function openRegisterPetModal() {
+            document.getElementById('registerPetForm').reset();
+            loadOwnersDropdown();
+            openModal('registerPetModal');
+        }
+
+        async function handleRegisterPet(e) {
+            e.preventDefault();
+            const saveBtn = document.getElementById('savePetBtn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+
+            try {
+                const payload = {
+                    name: document.getElementById('petName').value,
+                    species: document.getElementById('petSpecies').value,
+                    breed: document.getElementById('petBreed').value,
+                    dateOfBirth: document.getElementById('petDob').value,
+                    gender: document.getElementById('petGender').value,
+                    weight: document.getElementById('petWeight').value ? parseFloat(document.getElementById('petWeight').value) : null,
+                    ownerId: parseInt(document.getElementById('petOwnerId').value, 10)
+                };
+
+                await apiFetch('/api/pets', {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+
+                showToast(`Patient "${payload.name}" registered successfully.`);
+                closeModal('registerPetModal');
+                loadPets();
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save Patient Record';
+            }
+        }
+
+        async function handleDeletePet(id, name) {
+            if (!confirm(`Are you sure you want to delete patient "${name}" and all associated vaccination records?`)) return;
+            try {
+                await apiFetch(`/api/pets/${id}`, { method: 'DELETE' });
+                showToast(`Patient record "${name}" removed.`, 'warning');
+                loadPets();
+            } catch (err) {
+                showToast('Delete operation failed: ' + err.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

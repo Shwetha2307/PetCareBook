@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetCareBook — Vaccine Protocols Catalog</title>
+    <link rel="stylesheet" href="css/styles.css?v=3">
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-container">
+            <a href="index.html" class="brand-section">
+                <div class="brand-badge">
+                    <svg class="brand-logo-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <ellipse cx="12" cy="16.5" rx="4.6" ry="3.6"/>
+                        <ellipse cx="6.5" cy="9" rx="1.75" ry="2.3" transform="rotate(-15 6.5 9)"/>
+                        <ellipse cx="17.5" cy="9" rx="1.75" ry="2.3" transform="rotate(15 17.5 9)"/>
+                        <ellipse cx="10" cy="5.5" rx="1.6" ry="2.15"/>
+                        <ellipse cx="14" cy="5.5" rx="1.6" ry="2.15"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="brand-name">PetCareBook</span>
+                    <span class="brand-sub">Clinical CIS</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul class="nav-menu" id="mainNavMenu">
+                    <li><a href="index.html" class="nav-item-link" id="nav-dashboard">Dashboard</a></li>
+                    <li><a href="pets.html" class="nav-item-link" id="nav-pets">Patients</a></li>
+                    <li><a href="owners.html" class="nav-item-link" id="nav-owners">Clients</a></li>
+                    <li><a href="vaccinate.html" class="nav-item-link" id="nav-vaccinate">Administer</a></li>
+                    <li>
+                        <a href="due-soon.html" class="nav-item-link" id="nav-due-soon">
+                            Schedule
+                            <span id="nav-due-badge" class="count-pill" style="display: none;">0</span>
+                        </a>
+                    </li>
+                    <li><a href="history.html" class="nav-item-link" id="nav-history">Records</a></li>
+                    <li><a href="vaccines.html" class="nav-item-link active" id="nav-vaccines">Protocols</a></li>
+                </ul>
+            </nav>
+
+            <div class="nav-actions">
+                <a href="vaccinate.html" class="btn btn-primary btn-sm">+ Record Vaccine</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="content-wrapper">
+        <div class="view-header">
+            <div class="view-title-group">
+                <h1>Vaccine Protocols & Standard Intervals</h1>
+                <p>Master catalog of approved clinical vaccines, species eligibility, and automated booster schedules.</p>
+            </div>
+            <div>
+                <button class="btn btn-primary" onclick="openCreateVaccineModal()">+ Define Vaccine Protocol</button>
+            </div>
+        </div>
+
+        <!-- Filter Pills by Species -->
+        <div class="toolbar-bar">
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="filterSpecies('all', this)">All Species</button>
+                <button class="tab-btn" onclick="filterSpecies('Dog', this)">Canine (Dogs)</button>
+                <button class="tab-btn" onclick="filterSpecies('Cat', this)">Feline (Cats)</button>
+            </div>
+            <div id="vaccineCountLabel" style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
+                <!-- e.g. 6 Protocols Defined -->
+            </div>
+        </div>
+
+        <!-- Vaccine Catalog Table Panel -->
+        <div class="panel">
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Vaccine Protocol Name</th>
+                            <th>Target Species</th>
+                            <th>Standard Booster Interval</th>
+                            <th>Regulatory Classification</th>
+                            <th>Clinical Indications & Coverage</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vaccineTableBody">
+                        <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading protocol catalog...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Vaccine Protocol Modal Dialog -->
+    <div id="createVaccineModal" class="modal-backdrop">
+        <div class="modal-card">
+            <div class="modal-header-bar">
+                <h2>Define Vaccine Protocol</h2>
+                <button class="modal-close-btn" onclick="closeModal('createVaccineModal')">&times;</button>
+            </div>
+            <form id="createVaccineForm" onsubmit="handleCreateVaccine(event)">
+                <div style="padding: 1.25rem;">
+                    <div class="form-group">
+                        <label class="form-label">Protocol Name *</label>
+                        <input type="text" id="vaccineName" class="form-input" placeholder="e.g. Leptospirosis 4-Way Vaccine" required>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Target Species *</label>
+                            <select id="targetSpecies" class="form-select" required>
+                                <option value="All">All Species</option>
+                                <option value="Dog" selected>Dog (Canine)</option>
+                                <option value="Cat">Cat (Feline)</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Standard Booster Interval (Days) *</label>
+                            <input type="number" id="intervalDays" class="form-input" placeholder="e.g. 365" min="1" required>
+                            <span class="form-helper">Fixed interval used to auto-calculate the next due date.</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Description & Dosage Guidelines</label>
+                        <textarea id="vaccineDesc" class="form-textarea" rows="2" placeholder="Clinical administration recommendations, indications, and requirements..."></textarea>
+                    </div>
+
+                    <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                        <input type="checkbox" id="isMandatory" checked style="width: 16px; height: 16px; cursor: pointer;">
+                        <label for="isMandatory" style="cursor: pointer; font-size: 0.85rem; font-weight: 500;">
+                            Mandatory / Core Immunization Protocol
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-footer-bar">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('createVaccineModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveVaccineBtn">Save Protocol</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="footer-container"></div>
+
+    <script src="js/common.js?v=3"></script>
+    <script>
+        let currentSpecies = 'all';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderNavbar('vaccines');
+            renderFooter();
+            loadVaccineTypes();
+        });
+
+        function filterSpecies(species, btn) {
+            currentSpecies = species;
+            document.querySelectorAll('.tab-nav .tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            loadVaccineTypes();
+        }
+
+        async function loadVaccineTypes() {
+            try {
+                let url = '/api/vaccine-types';
+                if (currentSpecies && currentSpecies !== 'all') {
+                    url += `?species=${encodeURIComponent(currentSpecies)}`;
+                }
+
+                const vaccines = await apiFetch(url);
+                const tableBody = document.getElementById('vaccineTableBody');
+                const countLabel = document.getElementById('vaccineCountLabel');
+
+                if (!vaccines || vaccines.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No vaccine protocols registered.</td></tr>';
+                    countLabel.textContent = '0 Protocols';
+                    return;
+                }
+
+                countLabel.textContent = `${vaccines.length} Protocols Defined`;
+
+                tableBody.innerHTML = vaccines.map(v => {
+                    let intervalHuman = `${v.standardIntervalDays} days`;
+                    if (v.standardIntervalDays === 365) intervalHuman += ' (1 Year)';
+                    else if (v.standardIntervalDays === 180) intervalHuman += ' (~6 Months)';
+                    else if (v.standardIntervalDays === 90) intervalHuman += ' (~3 Months)';
+
+                    return `
+                        <tr>
+                            <td>
+                                <strong>${escapeHtml(v.name)}</strong>
+                            </td>
+                            <td class="col-nowrap">
+                                <span class="tag-species">${escapeHtml(v.targetSpecies)}</span>
+                            </td>
+                            <td class="col-nowrap">
+                                <strong>${intervalHuman}</strong>
+                            </td>
+                            <td class="col-nowrap">
+                                ${v.mandatory ?
+                                    '<span class="status-pill status-overdue"><span class="status-dot"></span>Core / Mandatory</span>' :
+                                    '<span class="status-pill status-ok"><span class="status-dot"></span>Elective / Lifestyle</span>'}
+                            </td>
+                            <td style="color: var(--slate-600); font-size: 0.85rem;">
+                                ${escapeHtml(v.description || 'Standard veterinary vaccine protocol')}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                showToast('Failed to load protocols: ' + err.message, 'error');
+            }
+        }
+
+        function openCreateVaccineModal() {
+            document.getElementById('createVaccineForm').reset();
+            openModal('createVaccineModal');
+        }
+
+        async function handleCreateVaccine(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveVaccineBtn');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            try {
+                const payload = {
+                    name: document.getElementById('vaccineName').value,
+                    targetSpecies: document.getElementById('targetSpecies').value,
+                    standardIntervalDays: parseInt(document.getElementById('intervalDays').value, 10),
+                    description: document.getElementById('vaccineDesc').value,
+                    mandatory: document.getElementById('isMandatory').checked
+                };
+
+                await apiFetch('/api/vaccine-types', {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+
+                showToast(`Protocol "${payload.name}" added to catalog.`);
+                closeModal('createVaccineModal');
+                loadVaccineTypes();
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Save Protocol';
+            }
+        }
+    </script>
+</body>
+</html>

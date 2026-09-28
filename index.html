@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetCareBook — Clinical Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css?v=3">
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-container">
+            <a href="index.html" class="brand-section">
+                <div class="brand-badge">
+                    <svg class="brand-logo-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <ellipse cx="12" cy="16.5" rx="4.6" ry="3.6"/>
+                        <ellipse cx="6.5" cy="9" rx="1.75" ry="2.3" transform="rotate(-15 6.5 9)"/>
+                        <ellipse cx="17.5" cy="9" rx="1.75" ry="2.3" transform="rotate(15 17.5 9)"/>
+                        <ellipse cx="10" cy="5.5" rx="1.6" ry="2.15"/>
+                        <ellipse cx="14" cy="5.5" rx="1.6" ry="2.15"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="brand-name">PetCareBook</span>
+                    <span class="brand-sub">Clinical CIS</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul class="nav-menu" id="mainNavMenu">
+                    <li><a href="index.html" class="nav-item-link active" id="nav-dashboard">Dashboard</a></li>
+                    <li><a href="pets.html" class="nav-item-link" id="nav-pets">Patients</a></li>
+                    <li><a href="owners.html" class="nav-item-link" id="nav-owners">Clients</a></li>
+                    <li><a href="vaccinate.html" class="nav-item-link" id="nav-vaccinate">Administer</a></li>
+                    <li>
+                        <a href="due-soon.html" class="nav-item-link" id="nav-due-soon">
+                            Schedule
+                            <span id="nav-due-badge" class="count-pill" style="display: none;">0</span>
+                        </a>
+                    </li>
+                    <li><a href="history.html" class="nav-item-link" id="nav-history">Records</a></li>
+                    <li><a href="vaccines.html" class="nav-item-link" id="nav-vaccines">Protocols</a></li>
+                </ul>
+            </nav>
+
+            <div class="nav-actions">
+                <a href="vaccinate.html" class="btn btn-primary btn-sm">+ Record Vaccine</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="content-wrapper">
+        <div class="view-header">
+            <div class="view-title-group">
+                <h1>Clinical Immunization Dashboard</h1>
+                <p>Real-time patient monitoring, 7-day booster schedules, and regulatory compliance.</p>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <a href="pets.html" class="btn btn-secondary">Patient Registry</a>
+                <a href="vaccinate.html" class="btn btn-primary">+ Record Vaccination</a>
+            </div>
+        </div>
+
+        <!-- Alert Notification Panel (shown when overdue or due in 7 days exists) -->
+        <div id="urgentNoticePanel" class="notice-box warning" style="display: none;">
+            <div class="notice-content">
+                <div id="noticeIcon" style="flex-shrink: 0;"></div>
+                <div>
+                    <div id="noticeTitle" class="notice-title">Action Required: Upcoming Immunizations</div>
+                    <div id="noticeDesc" class="notice-desc">Booster schedules detected within the 7-day operational window.</div>
+                </div>
+            </div>
+            <a href="due-soon.html" class="btn btn-secondary btn-sm">Review Schedule &rarr;</a>
+        </div>
+
+        <!-- Key Metrics Cards -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span>Active Patients</span>
+                    <div class="kpi-icon-tile tone-mint">
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <ellipse cx="12" cy="16.5" rx="4.6" ry="3.6"/>
+                            <ellipse cx="6.5" cy="9" rx="1.75" ry="2.3" transform="rotate(-15 6.5 9)"/>
+                            <ellipse cx="17.5" cy="9" rx="1.75" ry="2.3" transform="rotate(15 17.5 9)"/>
+                            <ellipse cx="10" cy="5.5" rx="1.6" ry="2.15"/>
+                            <ellipse cx="14" cy="5.5" rx="1.6" ry="2.15"/>
+                        </svg>
+                    </div>
+                </div>
+                <div id="statTotalPets" class="kpi-value">—</div>
+                <div class="kpi-footer">Registered in system</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span>Client Accounts</span>
+                    <div class="kpi-icon-tile tone-blue">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    </div>
+                </div>
+                <div id="statTotalOwners" class="kpi-value">—</div>
+                <div class="kpi-footer">Pet owners verified</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span>Due in 7 Days</span>
+                    <div class="kpi-icon-tile tone-amber">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="3" y="4" width="18" height="18" rx="2"/>
+                            <path d="M16 2v4M8 2v4M3 10h18"/>
+                            <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>
+                        </svg>
+                    </div>
+                </div>
+                <div id="statDueSoon" class="kpi-value" style="color: var(--warning-700);">—</div>
+                <div class="kpi-footer">Booster window active</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span>Overdue Boosters</span>
+                    <div class="kpi-icon-tile tone-rose">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                    </div>
+                </div>
+                <div id="statOverdue" class="kpi-value" style="color: var(--danger-600);">—</div>
+                <div class="kpi-footer urgent">Critical attention needed</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span>Total Doses Logged</span>
+                    <div class="kpi-icon-tile tone-violet">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="m18 2 4 4"/>
+                            <path d="m17 7 3-3"/>
+                            <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/>
+                            <path d="m9 11 4 4"/>
+                            <path d="m5 19-3 3"/>
+                            <path d="m14 4 6 6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div id="statTotalGiven" class="kpi-value">—</div>
+                <div class="kpi-footer">Historical vaccinations</div>
+            </div>
+        </div>
+
+        <!-- 2 Column Section: 7-Day Due & Recent Activity -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(clamp(320px, 45vw, 620px), 1fr)); gap: 1.5rem;">
+            
+            <!-- 7-Day Due Table -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Due within Next 7 Days</div>
+                    <a href="due-soon.html" class="btn btn-secondary btn-sm">Open Schedule</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Protocol / Vaccine</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dueSoonBody">
+                            <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading schedules...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Activity Table -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Recent Administration Logs</div>
+                    <a href="history.html" class="btn btn-secondary btn-sm">All Records</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Vaccine</th>
+                                <th>Administered</th>
+                                <th>Next Scheduled</th>
+                                <th>Client</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentBody">
+                            <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading logs...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script src="js/common.js?v=3"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderNavbar('dashboard');
+            renderFooter();
+            loadDashboard();
+        });
+
+        async function loadDashboard() {
+            try {
+                const stats = await apiFetch('/api/dashboard/stats');
+                document.getElementById('statTotalPets').textContent = stats.totalPets;
+                document.getElementById('statTotalOwners').textContent = stats.totalOwners;
+                document.getElementById('statDueSoon').textContent = stats.dueInNext7DaysCount;
+                document.getElementById('statOverdue').textContent = stats.overdueCount;
+                document.getElementById('statTotalGiven').textContent = stats.totalVaccinationsGiven;
+
+                // Configure urgent notification box
+                const noticePanel = document.getElementById('urgentNoticePanel');
+                const noticeIcon = document.getElementById('noticeIcon');
+                if (stats.overdueCount > 0 || stats.dueInNext7DaysCount > 0) {
+                    noticePanel.style.display = 'flex';
+                    if (stats.overdueCount > 0) {
+                        noticePanel.className = 'notice-box danger';
+                        noticeIcon.innerHTML = window.getIcon ? window.getIcon('alert') : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
+                        document.getElementById('noticeTitle').textContent = `Urgent: ${stats.overdueCount} Overdue Immunization(s) Detected`;
+                        document.getElementById('noticeDesc').textContent = `${stats.dueInNext7DaysCount} additional booster(s) due within the next 7 days. Client outreach advised.`;
+                    } else {
+                        noticePanel.className = 'notice-box warning';
+                        noticeIcon.innerHTML = window.getIcon ? window.getIcon('warning') : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path></svg>';
+                        document.getElementById('noticeTitle').textContent = `${stats.dueInNext7DaysCount} Vaccination(s) Due in the Next 7 Days`;
+                        document.getElementById('noticeDesc').textContent = `Booster notifications pending for registered patient owners.`;
+                    }
+                }
+
+                // Load Due Soon (7 Days)
+                const dueSoon = await apiFetch('/api/vaccinations/due-soon?days=7');
+                const dueBody = document.getElementById('dueSoonBody');
+                if (!dueSoon || dueSoon.length === 0) {
+                    dueBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No boosters due in the next 7 days. All patients compliant.</td></tr>`;
+                } else {
+                    dueBody.innerHTML = dueSoon.slice(0, 5).map(r => `
+                        <tr>
+                            <td>
+                                <strong>${escapeHtml(r.petName)}</strong>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">${escapeHtml(r.species)} &bull; ${escapeHtml(r.breed)}</div>
+                            </td>
+                            <td>${escapeHtml(r.vaccineName)}</td>
+                            <td class="col-nowrap"><strong>${formatDate(r.nextDueDate)}</strong></td>
+                            <td class="col-nowrap">${getDueStatusBadge(r.status, r.daysRemainingUntilDue)}</td>
+                            <td class="col-nowrap" style="text-align: right;">
+                                <a href="vaccinate.html?petId=${r.petId}&vaccineTypeId=${r.vaccineTypeId}" class="btn btn-secondary btn-sm">Administer</a>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+
+                // Load Recent Logs
+                const all = await apiFetch('/api/vaccinations');
+                const recentBody = document.getElementById('recentBody');
+                if (!all || all.length === 0) {
+                    recentBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No vaccination logs recorded.</td></tr>`;
+                } else {
+                    recentBody.innerHTML = all.slice(0, 5).map(r => `
+                        <tr>
+                            <td><strong>${escapeHtml(r.petName)}</strong></td>
+                            <td>${escapeHtml(r.vaccineName)}</td>
+                            <td class="col-nowrap">${formatDate(r.dateAdministered)}</td>
+                            <td class="col-nowrap">${formatDate(r.nextDueDate)}</td>
+                            <td>
+                                <div>${escapeHtml(r.ownerName)}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted); white-space: nowrap;">${escapeHtml(r.ownerPhone)}</div>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+
+            } catch (err) {
+                showToast('Failed to load dashboard metrics: ' + err.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetCareBook — Client Directory</title>
+    <link rel="stylesheet" href="css/styles.css?v=3">
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-container">
+            <a href="index.html" class="brand-section">
+                <div class="brand-badge">
+                    <svg class="brand-logo-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <ellipse cx="12" cy="16.5" rx="4.6" ry="3.6"/>
+                        <ellipse cx="6.5" cy="9" rx="1.75" ry="2.3" transform="rotate(-15 6.5 9)"/>
+                        <ellipse cx="17.5" cy="9" rx="1.75" ry="2.3" transform="rotate(15 17.5 9)"/>
+                        <ellipse cx="10" cy="5.5" rx="1.6" ry="2.15"/>
+                        <ellipse cx="14" cy="5.5" rx="1.6" ry="2.15"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="brand-name">PetCareBook</span>
+                    <span class="brand-sub">Clinical CIS</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul class="nav-menu" id="mainNavMenu">
+                    <li><a href="index.html" class="nav-item-link" id="nav-dashboard">Dashboard</a></li>
+                    <li><a href="pets.html" class="nav-item-link" id="nav-pets">Patients</a></li>
+                    <li><a href="owners.html" class="nav-item-link active" id="nav-owners">Clients</a></li>
+                    <li><a href="vaccinate.html" class="nav-item-link" id="nav-vaccinate">Administer</a></li>
+                    <li>
+                        <a href="due-soon.html" class="nav-item-link" id="nav-due-soon">
+                            Schedule
+                            <span id="nav-due-badge" class="count-pill" style="display: none;">0</span>
+                        </a>
+                    </li>
+                    <li><a href="history.html" class="nav-item-link" id="nav-history">Records</a></li>
+                    <li><a href="vaccines.html" class="nav-item-link" id="nav-vaccines">Protocols</a></li>
+                </ul>
+            </nav>
+
+            <div class="nav-actions">
+                <a href="vaccinate.html" class="btn btn-primary btn-sm">+ Record Vaccine</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="content-wrapper">
+        <div class="view-header">
+            <div class="view-title-group">
+                <h1>Client Accounts Directory</h1>
+                <p>Manage pet owner contacts, communications, and linked animal portfolios.</p>
+            </div>
+            <div>
+                <button class="btn btn-primary" onclick="openRegisterOwnerModal()">+ Register Client</button>
+            </div>
+        </div>
+
+        <!-- Owners Grid -->
+        <div id="ownersGrid" class="entity-grid">
+            <!-- Dynamically populated -->
+        </div>
+
+        <div id="emptyOwnersState" class="panel" style="display: none; text-align: center; padding: 3rem 1.5rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--slate-800);">No Clients Registered</h3>
+            <p style="color: var(--text-muted); font-size: 0.875rem; margin: 0.5rem 0 1.25rem 0;">Register client accounts to associate patient records and automated booster reminders.</p>
+            <button class="btn btn-primary btn-sm" onclick="openRegisterOwnerModal()">+ Register First Client</button>
+        </div>
+    </main>
+
+    <!-- Register Owner Modal Dialog -->
+    <div id="registerOwnerModal" class="modal-backdrop">
+        <div class="modal-card">
+            <div class="modal-header-bar">
+                <h2>Register Client Account</h2>
+                <button class="modal-close-btn" onclick="closeModal('registerOwnerModal')">&times;</button>
+            </div>
+            <form id="registerOwnerForm" onsubmit="handleRegisterOwner(event)">
+                <div style="padding: 1.25rem;">
+                    <div class="form-group">
+                        <label class="form-label">Full Legal Name *</label>
+                        <input type="text" id="ownerFullName" class="form-input" placeholder="e.g. Sarah Connor" required>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Email Address *</label>
+                            <input type="email" id="ownerEmail" class="form-input" placeholder="sarah.connor@example.com" required>
+                            <span class="form-helper">System reminders sent to this address. Unique constraint.</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number *</label>
+                            <input type="tel" id="ownerPhone" class="form-input" placeholder="+1 (555) 234-5678" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Billing / Physical Address</label>
+                        <textarea id="ownerAddress" class="form-textarea" rows="2" placeholder="Street Address, City, State, Postal Code"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer-bar">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('registerOwnerModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveOwnerBtn">Save Client Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Owner Pets View Modal -->
+    <div id="ownerPetsModal" class="modal-backdrop">
+        <div class="modal-card">
+            <div class="modal-header-bar">
+                <h2 id="ownerPetsModalTitle">Linked Patient Records</h2>
+                <button class="modal-close-btn" onclick="closeModal('ownerPetsModal')">&times;</button>
+            </div>
+            <div style="padding: 1.25rem;" id="ownerPetsModalContent">
+                <!-- Dynamically populated -->
+            </div>
+            <div class="modal-footer-bar">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('ownerPetsModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-container"></div>
+
+    <script src="js/common.js?v=3"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderNavbar('owners');
+            renderFooter();
+            loadOwners();
+        });
+
+        async function loadOwners() {
+            try {
+                const owners = await apiFetch('/api/owners');
+                const grid = document.getElementById('ownersGrid');
+                const empty = document.getElementById('emptyOwnersState');
+
+                if (!owners || owners.length === 0) {
+                    grid.innerHTML = '';
+                    empty.style.display = 'block';
+                    return;
+                }
+
+                empty.style.display = 'none';
+                grid.innerHTML = owners.map(o => `
+                    <div class="entity-card">
+                        <div>
+                            <div class="entity-header">
+                                <div>
+                                    <div class="entity-title">${escapeHtml(o.fullName)}</div>
+                                    <div class="entity-sub">Account #${o.id} &bull; Registered ${formatDate(o.createdAt ? o.createdAt.split('T')[0] : '')}</div>
+                                </div>
+                                <span class="tag-species">${o.petCount} ${o.petCount === 1 ? 'Patient' : 'Patients'}</span>
+                            </div>
+
+                            <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius-xs); padding: 0.75rem; font-size: 0.825rem; margin: 0.75rem 0;">
+                                <div style="margin-bottom: 0.35rem;">
+                                    <span style="color: var(--text-muted); font-size: 0.725rem; text-transform: uppercase; font-weight: 600; display: block;">Email</span>
+                                    <a href="mailto:${escapeHtml(o.email)}" style="color: var(--primary-700); text-decoration: none; font-weight: 500;">${escapeHtml(o.email)}</a>
+                                </div>
+                                <div style="margin-bottom: 0.35rem;">
+                                    <span style="color: var(--text-muted); font-size: 0.725rem; text-transform: uppercase; font-weight: 600; display: block;">Phone</span>
+                                    <span style="font-weight: 500;">${escapeHtml(o.phoneNumber)}</span>
+                                </div>
+                                <div>
+                                    <span style="color: var(--text-muted); font-size: 0.725rem; text-transform: uppercase; font-weight: 600; display: block;">Address</span>
+                                    <span style="color: var(--slate-600);">${escapeHtml(o.address || 'No physical address specified')}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="entity-footer-actions">
+                            <button onclick="viewOwnerPets(${o.id}, '${escapeHtml(o.fullName)}')" class="btn btn-secondary btn-sm" style="flex: 1;">Patients (${o.petCount})</button>
+                            <a href="pets.html" class="btn btn-primary btn-sm" style="flex: 1;">+ Register Patient</a>
+                            <button onclick="handleDeleteOwner(${o.id}, '${escapeHtml(o.fullName)}')" class="btn btn-danger btn-sm" title="Delete Client Account">${ICONS.trash}</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                showToast('Failed to load client accounts: ' + err.message, 'error');
+            }
+        }
+
+        async function viewOwnerPets(ownerId, ownerName) {
+            try {
+                const pets = await apiFetch(`/api/pets?ownerId=${ownerId}`);
+                document.getElementById('ownerPetsModalTitle').textContent = `Patients Registered to ${ownerName}`;
+                const content = document.getElementById('ownerPetsModalContent');
+
+                if (!pets || pets.length === 0) {
+                    content.innerHTML = `
+                        <div style="text-align: center; padding: 2rem 1rem; color: var(--text-muted); font-size: 0.875rem;">
+                            No active patient records linked to this account.
+                        </div>
+                    `;
+                } else {
+                    content.innerHTML = `
+                        <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+                            ${pets.map(p => `
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: #ffffff;">
+                                    <div>
+                                        <strong style="color: var(--slate-900);">${escapeHtml(p.name)}</strong>
+                                        <div style="font-size: 0.775rem; color: var(--text-muted);">${escapeHtml(p.species)} &bull; ${escapeHtml(p.breed)}</div>
+                                    </div>
+                                    <div style="display: flex; gap: 0.4rem;">
+                                        <a href="history.html?petId=${p.id}" class="btn btn-secondary btn-sm">History</a>
+                                        <a href="vaccinate.html?petId=${p.id}" class="btn btn-primary btn-sm">Administer</a>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+                openModal('ownerPetsModal');
+            } catch (err) {
+                showToast('Failed to fetch patient portfolio: ' + err.message, 'error');
+            }
+        }
+
+        function openRegisterOwnerModal() {
+            document.getElementById('registerOwnerForm').reset();
+            openModal('registerOwnerModal');
+        }
+
+        async function handleRegisterOwner(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveOwnerBtn');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            try {
+                const payload = {
+                    fullName: document.getElementById('ownerFullName').value,
+                    email: document.getElementById('ownerEmail').value,
+                    phoneNumber: document.getElementById('ownerPhone').value,
+                    address: document.getElementById('ownerAddress').value
+                };
+
+                await apiFetch('/api/owners', {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+
+                showToast(`Client account "${payload.fullName}" saved.`);
+                closeModal('registerOwnerModal');
+                loadOwners();
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Save Client Account';
+            }
+        }
+
+        async function handleDeleteOwner(id, name) {
+            if (!confirm(`Are you sure you want to delete client "${name}" and all associated patient records?`)) return;
+            try {
+                await apiFetch(`/api/owners/${id}`, { method: 'DELETE' });
+                showToast(`Client account "${name}" removed.`, 'warning');
+                loadOwners();
+            } catch (err) {
+                showToast('Delete operation failed: ' + err.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
